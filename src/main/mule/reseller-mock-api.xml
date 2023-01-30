@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ec42a066-f800-4304-a74a-ed2c10d85e01" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<flow name="reseller-mock-target-apiFlow" doc:id="40cd1f6c-0a73-4845-8906-61adf093c602" >
+		<http:listener doc:name="Listener" doc:id="1acdc04e-8523-490c-a32b-5f8504853a02" config-ref="HTTP_Listener_config" path="/mockdb" allowedMethods="POST"/>
+		<ee:transform doc:name="payload" doc:id="16f8e534-76e2-4985-99f3-6ac51dddda24" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="eed1932a-49a5-474c-9074-19a636192186" message="New customer entered successfully!!!::::#[payload]"/>
+	</flow>
+	<flow name="reseller-mock-apiFlow" doc:id="14a107c0-1e51-413c-845d-78d6e9a45f90" >
+		<http:listener doc:name="Listener" doc:id="d7d175c8-ea54-4ba0-a9c6-3e00a164fff3" config-ref="HTTP_Listener_config" path="/getCustomer" allowedMethods="GET"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b2e221fc-1692-4929-8dfc-6c3a083a5ddd" />
+		<set-payload value='#[{&#10;  "customerId": "4d4de7d6-7f5e-4778-9c70-babba6c25c55",&#10;  "personalInformation": {&#10;    "firstName": "Ulrich",&#10;    "lastName": "Nielsen",&#10;    "companyName": "E-ffoc",&#10;    "email": "ulrichN@effoc.com",&#10;    "phone": "+494341927420"&#10;  },&#10;  "address": [&#10;    {&#10;      "street": "Steinbrueckstrasse",&#10;      "houseNumber": 114,&#10;      "city": "Nuremberg",&#10;      "country": "Germany",&#10;      "postalCode": "90408"&#10;    }&#10;  ]&#10;}]' doc:name="customer info" doc:id="f465f3c9-174f-445b-b64c-73458f402b6d" mimeType="application/json" encoding="UTF-8"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7aade460-962a-4340-9812-66991acfc96c" message="CUSTOMER:::#[payload]"/>
+	</flow>
+</mule>
